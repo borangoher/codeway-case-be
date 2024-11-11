@@ -28,9 +28,10 @@ router.put("/", authenticateToken, async (req, res) => {
 
   try {
     const userDocRef = db.collection("parameters").doc(uid);
+    let userDoc;
 
     await db.runTransaction(async (transaction) => {
-      const userDoc = await transaction.get(userDocRef);
+      userDoc = await transaction.get(userDocRef);
 
       if (!userDoc.exists) {
         transaction.set(userDocRef, { params: [newItem] });
@@ -39,9 +40,10 @@ router.put("/", authenticateToken, async (req, res) => {
           params: admin.firestore.FieldValue.arrayUnion(newItem),
         });
       }
+
+      userDoc = await transaction.get(userDocRef);
     });
 
-    const userDoc = await transaction.get(userDocRef);
     res.status(200).json(userDoc.data());
   } catch (error) {
     console.error("Error adding item to array:", error);
@@ -57,9 +59,10 @@ router.post("/", authenticateToken, async (req, res) => {
 
   try {
     const userDocRef = db.collection("parameters").doc(uid);
+    let userDoc;
 
     await db.runTransaction(async (transaction) => {
-      const userDoc = await transaction.get(userDocRef);
+      userDoc = await transaction.get(userDocRef);
 
       if (!userDoc.exists) {
         return res.status(404).json({ error: "User document not found" });
@@ -74,9 +77,9 @@ router.post("/", authenticateToken, async (req, res) => {
 
       items[itemIndex] = { ...items[itemIndex], ...newItem };
       transaction.update(userDocRef, { params });
+      userDoc = await transaction.get(userDocRef);
     });
 
-    const userDoc = await transaction.get(userDocRef);
     res.status(200).json(userDoc);
   } catch (error) {
     console.error("Error updating item in array:", error);
@@ -92,9 +95,10 @@ router.delete("/", authenticateToken, async (req, res) => {
 
   try {
     const userDocRef = db.collection("parameters").doc(uid);
+    let userDoc;
 
     await db.runTransaction(async (transaction) => {
-      const userDoc = await transaction.get(userDocRef);
+      userDoc = await transaction.get(userDocRef);
 
       if (!userDoc.exists) {
         return res.status(404).json({ error: "User document not found" });
@@ -103,9 +107,9 @@ router.delete("/", authenticateToken, async (req, res) => {
       const items = userDoc.data().params || [];
       const updatedItems = items.filter((item) => item.id !== id);
       transaction.update(userDocRef, { params: updatedItems });
+      userDoc = await transaction.get(userDocRef);
     });
 
-    const userDoc = await transaction.get(userDocRef);
     res.status(200).json(userDoc);
   } catch (error) {
     console.error("Error deleting item from array:", error);
