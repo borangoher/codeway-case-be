@@ -1,4 +1,4 @@
-var { admin } = require("../app");
+var { admin } = require("../firebase");
 
 async function authenticateToken(req, res, next) {
   const idToken = req.headers.authorization?.split("Bearer ")[1];

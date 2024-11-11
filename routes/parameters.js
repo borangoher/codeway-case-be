@@ -1,8 +1,7 @@
 var express = require("express");
 var router = express.Router();
 var authenticateToken = require("../middleware/auth.js");
-var { admin } = require("../app");
-var db = admin.firestore();
+var { admin, db } = require("../firebase");
 
 router.get("/", authenticateToken, async (req, res) => {
   const uid = req.user.uid;
@@ -23,7 +22,7 @@ router.get("/", authenticateToken, async (req, res) => {
   }
 });
 
-router.post("/", authenticateToken, async (req, res) => {
+router.put("/", authenticateToken, async (req, res) => {
   const uid = req.user.uid;
   const newItem = req.body;
 
@@ -52,7 +51,7 @@ router.post("/", authenticateToken, async (req, res) => {
   }
 });
 
-router.update("/", authenticateToken, async (req, res) => {
+router.post("/", authenticateToken, async (req, res) => {
   const uid = req.user.uid;
   const newItem = req.body;
 
